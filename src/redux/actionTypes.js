@@ -1,0 +1,2 @@
+export const CREATE_FILE = "CREATE_FILE";
+export const TOGGLE_FILE_INPUT = "TOGGLE_FILE_INPUT";
