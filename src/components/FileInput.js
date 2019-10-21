@@ -1,20 +1,48 @@
 import React, { Component } from "react";
-import { TextField, Button } from "@material-ui/core";
+import { connect } from "react-redux";
+import { createFile } from "../redux/actions";
+import {
+  TextField,
+  Button,
+  Checkbox,
+  FormControlLabel
+} from "@material-ui/core";
 
-export default class FileInput extends Component {
+class FileInput extends Component {
   state = {
-    filename: ""
+    filename: "",
+    checkedFolder: false
   };
 
-  handleChange = event => {
-    this.setState({
-      filename: event.target.value
-    });
+  handleChange = name => event => {
+    if (name === "checkedFolder") {
+      this.setState({
+        ...this.state,
+        [name]: event.target.checked
+      });
+    } else {
+      this.setState({
+        ...this.state,
+        [name]: event.target.value
+      });
+    }
   };
 
   handleSubmit = event => {
     event.preventDefault();
-    console.log(this.state.filename);
+    const file = {
+      filename: this.state.filename,
+      id: Date.now(),
+      isFolder: this.state.checkedFolder,
+      createdAt: Date.now(),
+      children: []
+    };
+    this.props.createFile(this.props.currentFileId, file);
+    this.setState({
+      ...this.state,
+      filename: "",
+      checkedFolder: false
+    });
   };
 
   render() {
@@ -22,12 +50,23 @@ export default class FileInput extends Component {
       <form onSubmit={this.handleSubmit}>
         <TextField
           id="file-input"
-          label="Filename"
+          label="File Name/Folder Name"
           value={this.state.filename}
-          onChange={this.handleChange}
+          onChange={this.handleChange("filename")}
           margin="normal"
           fullWidth
           helperText="filename should contain a-z, A-Z, 0-9, and _ only."
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={this.state.checkedFolder}
+              onChange={this.handleChange("checkedFolder")}
+              value="checkedFolder"
+              color="primary"
+            />
+          }
+          label="Folder"
         />
         <Button variant="contained" color="primary" type="submit">
           Add
@@ -36,3 +75,21 @@ export default class FileInput extends Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    currentFileId: state.history.currentFileId
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    createFile: (currentFileId, file) =>
+      dispatch(createFile(currentFileId, file))
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(FileInput);

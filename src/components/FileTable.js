@@ -1,5 +1,5 @@
-import React from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import React, { Component } from "react";
+import { connect } from "react-redux";
 import {
   Table,
   TableBody,
@@ -9,35 +9,63 @@ import {
   Paper
 } from "@material-ui/core";
 import File from "./File";
+import { searchFileTree } from "../lib";
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    width: "100%",
-    overflowX: "auto"
-  },
-  table: {
-    minWidth: 650
+class FileTable extends Component {
+  render() {
+    let files = getFilesOnSameLevel(
+      this.props.fileTree,
+      this.props.currentFileId
+    );
+    return (
+      <Paper>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell align="right">Created At</TableCell>
+              <TableCell align="right">Items</TableCell>
+              <TableCell align="right">Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {files.length ? (
+              files.map(file => <File file={file} key={file.id} />)
+            ) : (
+              <TableRow>
+                <TableCell colSpan={4} align="center">
+                  Empty Folder
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </Paper>
+    );
   }
-}));
+}
 
-export default function FileTable() {
-  const classes = useStyles();
+const mapStateToProps = state => {
+  return {
+    fileTree: state.fileTree,
+    currentFileId: state.history.currentFileId
+  };
+};
 
-  return (
-    <Paper className={classes.root}>
-      <Table className={classes.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell align="right">Created At</TableCell>
-            <TableCell align="right">Size</TableCell>
-            <TableCell align="right">Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          <File />
-        </TableBody>
-      </Table>
-    </Paper>
-  );
+// const mapDispatchToProps = dispatch => {
+//   return {
+//     createFile: () => dispatch(createFile()),
+//     toggleFileInput: () => dispatch(toggleFileInput())
+//   };
+// };
+
+export default connect(
+  mapStateToProps,
+  null
+)(FileTable);
+
+function getFilesOnSameLevel(fileTree, id) {
+  let fileNode = searchFileTree(fileTree, id);
+  let files = fileNode ? fileNode.children : [];
+  return files;
 }

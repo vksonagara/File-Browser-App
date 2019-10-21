@@ -4,7 +4,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import FileTable from "./FileTable";
 import AddFile from "./AddFile";
-import AddFolder from "./AddFolder";
 import FileInput from "./FileInput";
 
 const useStyles = makeStyles(theme => ({
@@ -35,9 +34,6 @@ function FileContent(props) {
           className={classes.addIcons}
           spacing={3}
         >
-          <Grid item>
-            <AddFolder />
-          </Grid>
           <Grid item>
             <AddFile />
           </Grid>

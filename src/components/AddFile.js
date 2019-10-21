@@ -1,18 +1,30 @@
 import React from "react";
-import NoteAddIcon from "@material-ui/icons/NoteAdd";
 import { Fab } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import NoteAddIcon from "@material-ui/icons/NoteAdd";
+import { connect } from "react-redux";
+import { toggleFileInput } from "../redux/actions";
 
-const useStyles = makeStyles(theme => ({
-  margin: theme.spacing(1)
-}));
-
-export default function AddFile() {
-  const classes = useStyles();
-
+function AddFile(props) {
   return (
-    <Fab size="large" color="secondary" className={classes.margin}>
+    <Fab size="large" color="secondary" onClick={props.toggleFileInput}>
       <NoteAddIcon />
     </Fab>
   );
 }
+
+const mapStateToProps = state => {
+  return {
+    fileTree: state.fileTree
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    toggleFileInput: () => dispatch(toggleFileInput())
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AddFile);
